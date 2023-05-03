@@ -18,7 +18,6 @@
 </div>
 
 @section scripts{
-
     <script>
         $('.edit-container').on('click', '#showClients-btn', function (e) {
             e.preventDefault();
@@ -34,11 +33,18 @@
                 data: {},
                 url: 'home/GetClient?clientId=' + clientId,
                 success: function (data, output, status) {
-                    alert(data.count)
+                    if (data.success === false) {
+                        showNotification("Error", data.message, 'error');
+                        disActiveloader()
+                        return;
+                    }
+                    showNotification("Success", data.message, 'success');
+
                     disActiveloader()
                 },
                 error: function (output) {
-                    alert();
+                    showNotification("Error", "Undefined Error", 'error');
+
                     disActiveloader()
                 }
             });
@@ -60,21 +66,25 @@
                 url: 'home/GetConsortium?consortiumId=' + consortiumId,
                 success: function (data, output, status) {
                     if (data.success !== undefined || data.success === false) {
-                        alert();
-                        //showNotification("خطا", data.message, 'error');
+                        showNotification("Error", data.message, 'error');
                         return false;
                     }
                     $('.edit-container').html(data);
                     disActiveloader()
                 },
                 error: function (output) {
-                    alert();
+                    showNotification("Error", "Undefined Error", 'error');
                     disActiveloader()
                 }
             });
             $('.getData-btn').removeClass('disabled');
 
         })
+        function showNotification(title,message,type)
+        {
+            alert(message) ;
+        }
+
     </script>
 
 }

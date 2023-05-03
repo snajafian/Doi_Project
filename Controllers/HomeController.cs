@@ -29,35 +29,49 @@ namespace Doi_Project.Controllers
         [HttpGet]
         public async Task<IActionResult> GetConsortium(string consortiumId)
         {
-
-            var result = new ResultViewModel();
-            using (var httpClient = new HttpClient())
+            var result = Tuple.Create(false, "ورودی ها را کنترل کنید", "");
+            try
             {
-                using (var response = await httpClient.GetAsync($"https://api.datacite.org/providers?consortium-id={consortiumId}"))
+                var ResultViewModel = new ResultViewModel();
+                using (var httpClient = new HttpClient())
                 {
-                    var apiResponse = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<ResultViewModel>(apiResponse);
+                    using (var response = await httpClient.GetAsync($"https://api.datacite.org/providers?consortium-id={consortiumId}"))
+                    {
+                        var apiResponse = await response.Content.ReadAsStringAsync();
+                        ResultViewModel = JsonConvert.DeserializeObject<ResultViewModel>(apiResponse);
+                    }
                 }
+                return PartialView("_Providers", ResultViewModel);
             }
-            return PartialView("_Providers",result);
-
+            catch (Exception e)
+            {
+                return Json(new { success = result.Item1, message = "An unknown error has occurred", error = e });
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetClient(string clientId)
         {
-
-            var result = new ClientResultViewModel();
-            using (var httpClient = new HttpClient())
+            var result = Tuple.Create(false, "ورودی ها را کنترل کنید", "");
+            try
             {
-                using (var response = await httpClient.GetAsync($"https://api.datacite.org/dois?client_id={clientId}"))
+                
+                var ClientResultViewModel = new ClientResultViewModel();
+                using (var httpClient = new HttpClient())
                 {
-                    var apiResponse = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<ClientResultViewModel>(apiResponse);
+                    using (var response = await httpClient.GetAsync($"https://api.datacite.org/dois?client_id={clientId}"))
+                    {
+                        var apiResponse = await response.Content.ReadAsStringAsync();
+                        ClientResultViewModel = JsonConvert.DeserializeObject<ClientResultViewModel>(apiResponse);
+                    }
                 }
+                var count = ClientResultViewModel.Data.Count();
+                return Json(new { success = true, message = "Count of dois is "+count, error = "", count = count });
             }
-            return Ok(new { count = result.Data.Count() }); ;
-
+            catch (Exception e)
+            {
+                return Json(new { success = result.Item1, message = "An unknown error has occurred", error = e });
+            }
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
