@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div>
+    <div class="text-center">
+
+        <input type="text" id="consortiumCode" value="daraco" class="col-md-6" placeholder="Input Consortium" class="" />
+        <button id="getData-btn" value="Get" class="col-md-2">Get Date</button>
+    </div>
+    <div class="edit-container"></div>
+</div>
+
+@section scripts{
+
+    <script>
+        $('.edit-container').on('click', '#showClients-btn', function (e) {
+            e.preventDefault();
+            $(this).closest('tr').next().toggleClass('d-none')
+
+        });
+        $('.edit-container').on('click', '.client', function (e) {
+            e.preventDefault();
+            var clientId = $(this).attr('data-id');
+            activeloader();
+            var xhr = $.ajax({
+                type: "GET",
+                data: {},
+                url: 'home/GetClient?clientId=' + clientId,
+                success: function (data, output, status) {
+                    alert(data.count)
+                    disActiveloader()
+                },
+                error: function (output) {
+                    alert();
+                    disActiveloader()
+                }
+            });
+
+        });
+
+        $('#getData-btn').on('click', function (e) {
+            e.preventDefault();
+            $('.getData-btn').addClass('disabled');
+            var consortiumId = $('#consortiumCode').val();
+            if (consortiumId === 'undefined' || consortiumId === "0" || consortiumId.length === 0) {
+                alert('ورود کد')
+                return;
+            }
+            activeloader()
+            var xhr = $.ajax({
+                type: "GET",
+                data: {},
+                url: 'home/GetConsortium?consortiumId=' + consortiumId,
+                success: function (data, output, status) {
+                    if (data.success !== undefined || data.success === false) {
+                        alert();
+                        //showNotification("خطا", data.message, 'error');
+                        return false;
+                    }
+                    $('.edit-container').html(data);
+                    disActiveloader()
+                },
+                error: function (output) {
+                    alert();
+                    disActiveloader()
+                }
+            });
+            $('.getData-btn').removeClass('disabled');
+
+        })
+    </script>
+
+}
+
+<style>
+    .client {
+        padding: 5px 10px;
+        border: 1px solid green;
+        margin: 5px;
+        cursor: pointer;
+        text-align: center;
+        background: aliceblue;
+        color: #0b0b0c;
+        display: inline-block
+    }
+
+
+    /* Center the loader */
+    #loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 120px;
+        height: 120px;
+        margin: -76px 0 0 -76px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @@-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Add animation to "page content" */
+    .animate-bottom {
+        position: relative;
+        -webkit-animation-name: animatebottom;
+        -webkit-animation-duration: 1s;
+        animation-name: animatebottom;
+        animation-duration: 1s
+    }
+
+    @@-webkit-keyframes animatebottom {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+
+        to {
+            bottom: 0px;
+            opacity: 1
+        }
+    }
+
+    @@keyframes animatebottom {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+
+        to {
+            bottom: 0;
+            opacity: 1
+        }
+    }
+
+    #loaderparent {
+        background: #929598;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        opacity: .2;
+    }
+
+</style>
