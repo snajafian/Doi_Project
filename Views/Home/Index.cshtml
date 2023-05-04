@@ -10,7 +10,7 @@
 
 <div>
     <div class="text-center">
-
+        <input type="hidden" id="currentPage" value="1" />
         <input type="text" id="consortiumCode" value="daraco" class="col-md-6" placeholder="Input Consortium" class="" />
         <button id="getData-btn" value="Get" class="col-md-2">Get Date</button>
     </div>
@@ -19,19 +19,29 @@
 
 @section scripts{
     <script>
+       
+
         $('.edit-container').on('click', '#showClients-btn', function (e) {
             e.preventDefault();
             $(this).closest('tr').next().toggleClass('d-none')
 
         });
-        $('.edit-container').on('click', '.client', function (e) {
+        $('.edit-container').on('click', '.page-item', function (e) {
+            e.preventDefault();
+            
+            var page = $(this).attr('data-page');           
+            $('#currentPage').val(page);
+            $('#getData-btn').trigger('click');
+
+        });
+          $('.edit-container').on('click', '.client', function (e) {
             e.preventDefault();
             var clientId = $(this).attr('data-id');
             activeloader();
             var xhr = $.ajax({
                 type: "GET",
                 data: {},
-                url: 'home/GetClient?clientId=' + clientId,
+                url: 'home/GetClient?clientId=' + clientId ,
                 success: function (data, output, status) {
                     if (data.success === false) {
                         showNotification("Error", data.message, 'error');
@@ -63,10 +73,11 @@
             var xhr = $.ajax({
                 type: "GET",
                 data: {},
-                url: 'home/GetConsortium?consortiumId=' + consortiumId,
+                url: 'home/GetConsortium?consortiumId=' + consortiumId + '&page=' + $('#currentPage').val(),
                 success: function (data, output, status) {
                     if (data.success !== undefined || data.success === false) {
                         showNotification("Error", data.message, 'error');
+                        disActiveloader()
                         return false;
                     }
                     $('.edit-container').html(data);
@@ -104,7 +115,7 @@
 
     /* Center the loader */
     #loader {
-        position: absolute;
+        position: fixed;
         left: 50%;
         top: 50%;
         z-index: 1;
@@ -179,5 +190,7 @@
         z-index: 1000;
         opacity: .2;
     }
+
+  
 
 </style>

@@ -5,6 +5,8 @@ namespace Doi_Project.ViewModel
     public class ResultViewModel
     {
         public List<ProviderViewModel> Data { get; set; } = new List<ProviderViewModel>();
+        public MetaViewModel Meta { get; set; } = new MetaViewModel();
+
     }
 
     public class ProviderViewModel
@@ -13,6 +15,7 @@ namespace Doi_Project.ViewModel
         public string Type { get; set; }
         public AttributeViewModel Attributes { get; set; } = new AttributeViewModel();
         public RelationshipsViewModel Relationships { get; set; } = new RelationshipsViewModel();
+
     }
     public class AttributeViewModel
     {

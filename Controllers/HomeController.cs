@@ -27,15 +27,16 @@ namespace Doi_Project.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> GetConsortium(string consortiumId)
+        public async Task<IActionResult> GetConsortium(string consortiumId,long page=1)
         {
             var result = Tuple.Create(false, "ورودی ها را کنترل کنید", "");
             try
             {
                 var ResultViewModel = new ResultViewModel();
+                consortiumId=consortiumId.Trim();
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync($"https://api.datacite.org/providers?consortium-id={consortiumId}"))
+                    using (var response = await httpClient.GetAsync($"https://api.datacite.org/providers?consortium-id={consortiumId}&page[number]={page}"))
                     {
                         var apiResponse = await response.Content.ReadAsStringAsync();
                         ResultViewModel = JsonConvert.DeserializeObject<ResultViewModel>(apiResponse);
@@ -65,7 +66,8 @@ namespace Doi_Project.Controllers
                         ClientResultViewModel = JsonConvert.DeserializeObject<ClientResultViewModel>(apiResponse);
                     }
                 }
-                var count = ClientResultViewModel.Data.Count();
+                //var count = ClientResultViewModel.Data.Count();
+                var count = ClientResultViewModel.Meta.Total;
                 return Json(new { success = true, message = "Count of dois is "+count, error = "", count = count });
             }
             catch (Exception e)
